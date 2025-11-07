@@ -394,26 +394,29 @@
       return (input && input.value && input.value.trim()) ? input.value.trim() : WEBAPP_URL;
     }
 
-    async function syncStateToDrive() {
-      const url = getWebAppUrl();
-      if (!url) return alert('Paste your Apps Script Web App URL into the input field first.');
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'save', state })
-        });
-        const j = await res.json();
-        if (j.status === 'ok') {
-          alert('Synced to Google Sheet.');
-        } else {
-          alert('Sync response: ' + JSON.stringify(j));
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Sync failed: ' + String(err));
-      }
-    }
+async function syncStateToDrive() {
+  const url = getWebAppUrl();
+  if (!url) return alert('Paste your Apps Script Web App URL first.');
+
+  try {
+    const body = new URLSearchParams();
+    body.append('state', JSON.stringify(state));
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString()
+    });
+
+    const j = await res.json();
+    if (j.status === 'ok') alert('Synced to Google Sheet.');
+    else alert('Sync response: ' + JSON.stringify(j));
+
+  } catch (err) {
+    console.error(err);
+    alert('Sync failed: ' + String(err));
+  }
+}
 
     async function loadStateFromDrive() {
       const url = getWebAppUrl();
